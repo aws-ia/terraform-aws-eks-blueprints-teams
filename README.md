@@ -1,135 +1,266 @@
-# Teams
+# Kubernetes Team Module
 
-## Introduction
+Terraform module which provides a "namespace-as-a-service" for Kubernetes teams.
 
-The `eks-blueprints` framework provides support for onboarding and managing teams and easily configuring cluster access. We currently support two "`Team`" types: `application_teams` and `platform_teams`.
-`Application Teams` represent teams managing workloads running in cluster namespaces and `Platform Teams` represents platform administrators who have admin access (masters group) to clusters.
+## Usage
 
-### ApplicationTeam
+See [`multi-tenancy-with-teams`](../multi-tenancy-with-teams) directory for a working example to reference:
 
-To create an `application_team` for your cluster, you will need to supply a team name, with the options to pass map of labels, map of resource quotas, existing IAM entities (user/roles), and a directory where you may optionally place any policy definitions and generic manifests for the team.
-These manifests will be applied by the platform and will be outside of the team control
 
-**NOTE:** When the manifests are applied, namespaces are not checked. Therefore, you are responsible for namespace settings in the yaml files.
-> As of today (2020-05-01), resource `kubernetes_manifest` can only be used (`terraform plan/apply...`) only after the cluster has been created and the cluster API can be accessed. Read ["Before you use this resource"](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/manifest#before-you-use-this-resource) section for more information.
-To overcome this limitation, you can add/enable `manifests_dir` after you applied and created the cluster first. We are working on a better solution for this.
-
-#### Application Team Example
+### Standalone - Admin Team
 
 ```hcl
-  # EKS Application Teams
+module "admin_team" {
+  source = "../modules/kubernetes-team"
 
-  application_teams = {
-    # First Team
-    team-blue = {
-      "labels" = {
-        "appName"     = "example",
-        "projectName" = "example",
-        "environment" = "example",
-        "domain"      = "example",
-        "uuid"        = "example",
-      }
-      "quota" = {
-        "requests.cpu"    = "1000m",
-        "requests.memory" = "4Gi",
-        "limits.cpu"      = "2000m",
-        "limits.memory"   = "8Gi",
-        "pods"            = "10",
-        "secrets"         = "10",
-        "services"        = "10"
-      }
-      manifests_dir = "./manifests"
-      # Belows are examples of IAM users and roles
-      users = [
-        "arn:aws:iam::123456789012:user/blue-team-user",
-        "arn:aws:iam::123456789012:role/blue-team-sso-iam-role"
-      ]
-    }
+  name = "admin-team"
 
-    # Second Team
-    team-red = {
-      "labels" = {
-        "appName"     = "example2",
-        "projectName" = "example2",
-      }
-      "quota" = {
-        "requests.cpu"    = "2000m",
-        "requests.memory" = "8Gi",
-        "limits.cpu"      = "4000m",
-        "limits.memory"   = "16Gi",
-        "pods"            = "20",
-        "secrets"         = "20",
-        "services"        = "20"
-      }
-      manifests_dir = "./manifests2"
-      users = [
+  # Enables elevated, admin privileges for this team
+  enable_admin = true
+  users        = ["arn:aws:iam::111122223333:role/my-admin-role"]
+  cluster_arn  = "arn:aws:eks:us-west-2:111122223333:cluster/my-cluster"
 
-        "arn:aws:iam::123456789012:role/other-sso-iam-role"
-      ]
-    }
+  tags = {
+    Environment = "dev"
   }
+}
 ```
 
-The `application_teams` will do the following for every provided team:
-
-- Create a namespace
-- Register quotas
-- Register IAM users for cross-account access
-- Create a shared role for cluster access. Alternatively, an existing role can be supplied.
-- Register provided users/role in the `aws-auth` configmap for `kubectl` and console access to the cluster and namespace.
-- (Optionally) read all additional manifests (e.g., network policies, OPA policies, others) stored in a provided directory, and applies them.
-
-### PlatformTeam
-
-To create an `Platform Team` for your cluster, simply use `platform_teams`. You will need to supply a team name and and all users/roles.
-
-#### Platform Team Example
+### Standalone - Developer Team
 
 ```hcl
-  platform_teams = {
-    admin-team-name-example = {
-      users = [
-        "arn:aws:iam::123456789012:user/admin-user",
-        "arn:aws:iam::123456789012:role/org-admin-role"
-      ]
+module "development_team" {
+  source = "../modules/kubernetes-team"
+
+  name = "development-team"
+
+  users             = ["arn:aws:iam::012345678901:role/my-developer"]
+  cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
+  oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
+
+  # Lables applied to all Kubernetes resources
+  # More specific labels can be applied to individual resources under `namespaces` below
+  labels = {
+    team = "development"
+  }
+
+  # Annotations applied to all Kubernetes resources
+  # More specific labels can be applied to individual resources under `namespaces` below
+  annotations = {
+    team = "development"
+  }
+
+  namespaces = {
+    default = {
+      # Provides access to an existing namespace
+      create = false
+    }
+
+    development = {
+      labels = {
+        projectName = "project-awesome",
+      }
+
+      resource_quota = {
+        hard = {
+          "requests.cpu"    = "1000m",
+          "requests.memory" = "4Gi",
+          "limits.cpu"      = "2000m",
+          "limits.memory"   = "8Gi",
+          "pods"            = "10",
+          "secrets"         = "10",
+          "services"        = "10"
+        }
+      }
+
+      limit_range = {
+        limit = [
+          {
+            type = "Pod"
+            max = {
+              cpu    = "200m"
+              memory = "1Gi"
+            }
+          },
+          {
+            type = "PersistentVolumeClaim"
+            min = {
+              storage = "24M"
+            }
+          },
+          {
+            type = "Container"
+            default = {
+              cpu    = "50m"
+              memory = "24Mi"
+            }
+          }
+        ]
+      }
+
+      network_policy = {
+        pod_selector = {
+          match_expressions = [{
+            key      = "name"
+            operator = "In"
+            values   = ["webfront", "api"]
+          }]
+        }
+
+        ingress = [{
+          ports = [
+            {
+              port     = "http"
+              protocol = "TCP"
+            },
+            {
+              port     = "53"
+              protocol = "TCP"
+            },
+            {
+              port     = "53"
+              protocol = "UDP"
+            }
+          ]
+
+          from = [
+            {
+              namespace_selector = {
+                match_labels = {
+                  name = "default"
+                }
+              }
+            },
+            {
+              ip_block = {
+                cidr = "10.0.0.0/8"
+                except = [
+                  "10.0.0.0/24",
+                  "10.0.1.0/24",
+                ]
+              }
+            }
+          ]
+        }]
+
+        egress = [] # single empty rule to allow all egress traffic
+
+        policy_types = ["Ingress", "Egress"]
+      }
     }
   }
+
+  tags = {
+    Environment = "dev"
+  }
+}
 ```
 
-`Platform Team` does the following:
+### Multiple Teams
 
-- Registers IAM users for admin access to the cluster (`kubectl` and console)
-- Registers an existing role (or create a new role) for cluster access with trust relationship with the provided/created role
+You can utilize a module level `for_each` to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden.
 
-## Cluster Access (`kubectl`)
+```hcl
+module "development_team" {
+  source = "../modules/kubernetes-team"
 
-The output will contain the IAM roles for every application(`application_teams_iam_role_arn`) or platform team(`platform_teams_iam_role_arn`).
+  for_each = {
+    one = {
+      # Add any additional variables here and update definition below to use
+      users = ["arn:aws:iam::012345678901:role/developers-one"]
+    }
+    two = {
+      users = ["arn:aws:iam::012345678901:role/developers-two"]
+    }
+    three = {
+      users = ["arn:aws:iam::012345678901:role/developers-three"]
+    }
+  }
 
-To update your kubeconfig, you can run the following command:
+  name = "${each.key}-team"
 
+  users             = each.value.users
+  cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
+  oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
+
+  # Lables applied to all Kubernetes resources
+  # More specific labels can be applied to individual resources under `namespaces` below
+  labels = {
+    team = each.key
+  }
+
+  # Annotations applied to all Kubernetes resources
+  # More specific labels can be applied to individual resources under `namespaces` below
+  annotations = {
+    team = each.key
+  }
+
+  namespaces = {
+    (each.key) = {
+      labels = {
+        projectName = "project-awesome",
+      }
+
+      resource_quota = {
+        hard = {
+          "requests.cpu"    = "1000m",
+          "requests.memory" = "4Gi",
+          "limits.cpu"      = "2000m",
+          "limits.memory"   = "8Gi",
+          "pods"            = "10",
+          "secrets"         = "10",
+          "services"        = "10"
+        }
+      }
+
+      limit_range = {
+        limit = [
+          {
+            type = "Pod"
+            max = {
+              cpu    = "200m"
+              memory = "1Gi"
+            }
+          },
+          {
+            type = "PersistentVolumeClaim"
+            min = {
+              storage = "24M"
+            }
+          },
+          {
+            type = "Container"
+            default = {
+              cpu    = "50m"
+              memory = "24Mi"
+            }
+          }
+        ]
+      }
+    }
+  }
+
+  tags = {
+    Environment = "dev"
+  }
+}
 ```
-aws eks update-kubeconfig --name ${eks_cluster_id} --region ${AWS_REGION} --role-arn ${TEAM_ROLE_ARN}
-```
-
-Make sure to replace the `${eks_cluster_id}`, `${AWS_REGION}` and `${TEAM_ROLE_ARN}` with the actual values.
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.72 |
-| <a name="requirement_kubectl"></a> [kubectl](#requirement\_kubectl) | >= 1.14 |
-| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.10 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 4.47 |
+| <a name="requirement_kubernetes"></a> [kubernetes](#requirement\_kubernetes) | >= 2.17 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.72 |
-| <a name="provider_kubectl"></a> [kubectl](#provider\_kubectl) | >= 1.14 |
-| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.10 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 4.47 |
+| <a name="provider_kubernetes"></a> [kubernetes](#provider\_kubernetes) | >= 2.17 |
 
 ## Modules
 
@@ -139,42 +270,59 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [aws_iam_policy.platform_team_eks_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_role.platform_team](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role.team_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [aws_iam_role.team_sa_irsa](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
-| [kubectl_manifest.team](https://registry.terraform.io/providers/gavinbunney/kubectl/latest/docs/resources/manifest) | resource |
-| [kubernetes_cluster_role.team](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role) | resource |
-| [kubernetes_cluster_role_binding.team](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_binding) | resource |
-| [kubernetes_namespace.team](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace) | resource |
-| [kubernetes_resource_quota.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/resource_quota) | resource |
-| [kubernetes_role.team](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role) | resource |
-| [kubernetes_role_binding.team](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding) | resource |
-| [kubernetes_service_account.team](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account) | resource |
-| [aws_caller_identity.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/caller_identity) | data source |
-| [aws_eks_cluster.eks_cluster](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster) | data source |
-| [aws_iam_policy_document.platform_team_eks_access](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
-| [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [aws_iam_policy.admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
+| [aws_iam_role.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
+| [aws_iam_role_policy_attachment.admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_iam_role_policy_attachment.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [kubernetes_cluster_role_binding_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_binding_v1) | resource |
+| [kubernetes_cluster_role_v1.namespaced](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_v1) | resource |
+| [kubernetes_cluster_role_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/cluster_role_v1) | resource |
+| [kubernetes_limit_range_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/limit_range_v1) | resource |
+| [kubernetes_namespace_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/namespace_v1) | resource |
+| [kubernetes_network_policy_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/network_policy_v1) | resource |
+| [kubernetes_resource_quota_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/resource_quota_v1) | resource |
+| [kubernetes_role_binding_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/role_binding_v1) | resource |
+| [kubernetes_secret_v1.service_account_token](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/secret_v1) | resource |
+| [kubernetes_service_account_v1.this](https://registry.terraform.io/providers/hashicorp/kubernetes/latest/docs/resources/service_account_v1) | resource |
+| [aws_iam_policy_document.admin](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_iam_policy_document.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_application_teams"></a> [application\_teams](#input\_application\_teams) | Map of maps of teams to create | `any` | `{}` | no |
-| <a name="input_eks_cluster_id"></a> [eks\_cluster\_id](#input\_eks\_cluster\_id) | EKS Cluster name | `string` | n/a | yes |
+| <a name="input_admin_policy_name"></a> [admin\_policy\_name](#input\_admin\_policy\_name) | Name to use on admin IAM policy created | `string` | `""` | no |
+| <a name="input_annotations"></a> [annotations](#input\_annotations) | A map of Kubernetes annotations to add to all resources | `map(string)` | `{}` | no |
+| <a name="input_cluster_arn"></a> [cluster\_arn](#input\_cluster\_arn) | The Amazon Resource Name (ARN) of the cluster | `string` | `""` | no |
+| <a name="input_cluster_role_name"></a> [cluster\_role\_name](#input\_cluster\_role\_name) | Name to use on Kubernetes cluster role created | `string` | `""` | no |
+| <a name="input_create_cluster_role"></a> [create\_cluster\_role](#input\_create\_cluster\_role) | Determines whether a Kubernetes cluster role is created | `bool` | `true` | no |
+| <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role) | Determines whether an IAM role is created or to use an existing IAM role | `bool` | `true` | no |
+| <a name="input_create_role"></a> [create\_role](#input\_create\_role) | Determines whether a Kubernetes role is created. Note: the role created is a cluster role but its bound to only namespaced role bindings | `bool` | `true` | no |
+| <a name="input_enable_admin"></a> [enable\_admin](#input\_enable\_admin) | Determines whether an IAM role policy is created to grant admin access to the Kubernetes cluster | `bool` | `false` | no |
+| <a name="input_iam_role_arn"></a> [iam\_role\_arn](#input\_iam\_role\_arn) | Existing IAM role ARN for the node group. Required if `create_iam_role` is set to `false` | `string` | `null` | no |
+| <a name="input_iam_role_description"></a> [iam\_role\_description](#input\_iam\_role\_description) | Description of the role | `string` | `null` | no |
+| <a name="input_iam_role_max_session_duration"></a> [iam\_role\_max\_session\_duration](#input\_iam\_role\_max\_session\_duration) | Maximum session duration (in seconds) that you want to set for the specified role. If you do not specify a value for this setting, the default maximum of one hour is applied. This setting can have a value from 1 hour to 12 hours | `number` | `null` | no |
+| <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | Name to use on IAM role created | `string` | `null` | no |
+| <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | IAM role path | `string` | `null` | no |
 | <a name="input_iam_role_permissions_boundary"></a> [iam\_role\_permissions\_boundary](#input\_iam\_role\_permissions\_boundary) | ARN of the policy that is used to set the permissions boundary for the IAM role | `string` | `null` | no |
-| <a name="input_platform_teams"></a> [platform\_teams](#input\_platform\_teams) | Map of maps of teams to create | `any` | `{}` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all resources | `map(string)` | `{}` | no |
+| <a name="input_iam_role_policies"></a> [iam\_role\_policies](#input\_iam\_role\_policies) | IAM policies to be added to the IAM role created | `map(string)` | `{}` | no |
+| <a name="input_iam_role_use_name_prefix"></a> [iam\_role\_use\_name\_prefix](#input\_iam\_role\_use\_name\_prefix) | Determines whether the IAM role name (`iam_role_name`) is used as a prefix | `bool` | `true` | no |
+| <a name="input_labels"></a> [labels](#input\_labels) | A map of Kubernetes labels to add to all resources | `map(string)` | `{}` | no |
+| <a name="input_name"></a> [name](#input\_name) | A common name used across resources created unless a more specific resource name is provdied | `string` | `""` | no |
+| <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | A map of Kubernetes namespace definitions to create | `any` | `{}` | no |
+| <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | ARN of the OIDC provider created by the EKS cluster | `string` | `""` | no |
+| <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name to use on Kubernetes role created | `string` | `""` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all AWS resources | `map(string)` | `{}` | no |
+| <a name="input_users"></a> [users](#input\_users) | A list of IAM user and/or role ARNs that can assume the IAM role created | `list(string)` | `[]` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
-| <a name="output_application_teams_configure_kubectl"></a> [application\_teams\_configure\_kubectl](#output\_application\_teams\_configure\_kubectl) | Configure kubectl for each Application Teams: make sure you're logged in with the correct AWS profile and run the following command to update your kubeconfig |
-| <a name="output_application_teams_iam_role_arn"></a> [application\_teams\_iam\_role\_arn](#output\_application\_teams\_iam\_role\_arn) | IAM role ARN for Teams |
-| <a name="output_platform_teams_configure_kubectl"></a> [platform\_teams\_configure\_kubectl](#output\_platform\_teams\_configure\_kubectl) | Configure kubectl for each Platform Team: make sure you're logged in with the correct AWS profile and run the following command to update your kubeconfig |
-| <a name="output_platform_teams_iam_role_arn"></a> [platform\_teams\_iam\_role\_arn](#output\_platform\_teams\_iam\_role\_arn) | IAM role ARN for Platform Teams |
-| <a name="output_team_sa_irsa_iam_role"></a> [team\_sa\_irsa\_iam\_role](#output\_team\_sa\_irsa\_iam\_role) | IAM role name for Teams EKS Service Account (IRSA) |
-| <a name="output_team_sa_irsa_iam_role_arn"></a> [team\_sa\_irsa\_iam\_role\_arn](#output\_team\_sa\_irsa\_iam\_role\_arn) | IAM role ARN for Teams EKS Service Account (IRSA) |
+| <a name="output_aws_auth_configmap_role"></a> [aws\_auth\_configmap\_role](#output\_aws\_auth\_configmap\_role) | Dictionary containing the necessary details for adding the role created to the `aws-auth` configmap |
+| <a name="output_iam_role_arn"></a> [iam\_role\_arn](#output\_iam\_role\_arn) | The Amazon Resource Name (ARN) specifying the IAM role |
+| <a name="output_iam_role_name"></a> [iam\_role\_name](#output\_iam\_role\_name) | The name of the IAM role |
+| <a name="output_iam_role_unique_id"></a> [iam\_role\_unique\_id](#output\_iam\_role\_unique\_id) | Stable and unique string identifying the IAM role |
+| <a name="output_namespaces"></a> [namespaces](#output\_namespaces) | Mapf of Kubernetes namespaces created and their attributes |
+| <a name="output_rbac_group"></a> [rbac\_group](#output\_rbac\_group) | The name of the Kubernetes RBAC group |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
