@@ -1,45 +1,41 @@
-################################################################################
-# K8s Namespace
-################################################################################
-
-output "namespaces" {
-  description = "Mapf of Kubernetes namespaces created and their attributes"
-  value       = kubernetes_namespace_v1.this
+output "platform_teams_iam_role_arn" {
+  description = "IAM role ARN for Platform Teams"
+  value = tomap({
+    for k, v in aws_iam_role.platform_team : k => v.arn
+  })
 }
 
-################################################################################
-# K8s RBAC
-################################################################################
-
-output "rbac_group" {
-  description = "The name of the Kubernetes RBAC group"
-  value       = var.enable_admin ? "system:masters" : var.name
+output "application_teams_iam_role_arn" {
+  description = "IAM role ARN for Teams"
+  value = tomap({
+    for k, v in aws_iam_role.team_access : k => v.arn
+  })
 }
 
-output "aws_auth_configmap_role" {
-  description = "Dictionary containing the necessary details for adding the role created to the `aws-auth` configmap"
-  value = {
-    rolearn  = try(aws_iam_role.this[0].arn, var.iam_role_arn)
-    username = var.name
-    groups   = [var.enable_admin ? "system:masters" : var.name]
-  }
+output "team_sa_irsa_iam_role" {
+  description = "IAM role name for Teams EKS Service Account (IRSA)"
+  value = tomap({
+    for k, v in aws_iam_role.team_sa_irsa : k => v.name
+  })
 }
 
-################################################################################
-# IAM Role
-################################################################################
-
-output "iam_role_name" {
-  description = "The name of the IAM role"
-  value       = try(aws_iam_role.this[0].name, null)
+output "team_sa_irsa_iam_role_arn" {
+  description = "IAM role ARN for Teams EKS Service Account (IRSA)"
+  value = tomap({
+    for k, v in aws_iam_role.team_sa_irsa : k => v.arn
+  })
 }
 
-output "iam_role_arn" {
-  description = "The Amazon Resource Name (ARN) specifying the IAM role"
-  value       = try(aws_iam_role.this[0].arn, var.iam_role_arn)
+output "platform_teams_configure_kubectl" {
+  description = "Configure kubectl for each Platform Team: make sure you're logged in with the correct AWS profile and run the following command to update your kubeconfig"
+  value = tomap({
+    for k, v in aws_iam_role.platform_team : k => "aws eks --region ${data.aws_region.current.id} update-kubeconfig --name ${data.aws_eks_cluster.eks_cluster.name}  --role-arn ${v.arn}"
+  })
 }
 
-output "iam_role_unique_id" {
-  description = "Stable and unique string identifying the IAM role"
-  value       = try(aws_iam_role.this[0].unique_id, null)
+output "application_teams_configure_kubectl" {
+  description = "Configure kubectl for each Application Teams: make sure you're logged in with the correct AWS profile and run the following command to update your kubeconfig"
+  value = tomap({
+    for k, v in aws_iam_role.team_access : k => "aws eks --region ${data.aws_region.current.id} update-kubeconfig --name ${data.aws_eks_cluster.eks_cluster.name}  --role-arn ${v.arn}"
+  })
 }
