@@ -82,6 +82,7 @@ resource "kubernetes_cluster_role_binding" "team" {
 
 resource "kubernetes_role" "team" {
   for_each = var.application_teams
+  #checkov:skip=CKV_K8S_49:API Groups access required for first deployment.
   metadata {
     name      = "${each.key}-role"
     namespace = kubernetes_namespace.team[each.key].metadata[0].name

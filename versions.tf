@@ -14,5 +14,9 @@ terraform {
       source  = "gavinbunney/kubectl"
       version = ">= 1.14"
     }
+    awscc = {
+      source  = "hashicorp/awscc"
+      version = ">= 0.24.0"
+    }
   }
 }
