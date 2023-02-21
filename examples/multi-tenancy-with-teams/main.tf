@@ -1,5 +1,5 @@
 #---------------------------------------------------------------
-# EKS Blueprints
+# EKS
 #---------------------------------------------------------------
 
 module "eks" {
@@ -20,6 +20,7 @@ module "eks" {
     }
   }
   cluster_endpoint_public_access = false
+  cluster_enabled_log_types      = ["audit", "api", "authenticator", "scheduler", "controllerManager"]
 }
 
 #---------------------------------------------------------------
@@ -124,6 +125,19 @@ module "vpc" {
     "kubernetes.io/cluster/${local.name}" = "shared"
     "kubernetes.io/role/internal-elb"     = 1
   }
+
+  map_public_ip_on_launch = false
+
+  # Enable Flow Logs
+  # Adding TFSec targeted ignore due a bug in tfsec v1.28.1
+  # https://github.com/aquasecurity/tfsec/issues/1941
+  #tfsec:ignore:aws-vpc-require-vpc-flow-logs-for-all-vpcs
+  enable_flow_log                           = true
+  create_flow_log_cloudwatch_log_group      = true
+  create_flow_log_cloudwatch_iam_role       = true
+  flow_log_max_aggregation_interval         = 60
+  flow_log_cloudwatch_log_group_name_prefix = "/aws/eks-vpc-flow-logs/"
+  flow_log_cloudwatch_log_group_name_suffix = "multi-tenancy-with-teams"
 
   tags = local.tags
 }
