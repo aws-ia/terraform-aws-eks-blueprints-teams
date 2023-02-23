@@ -6,7 +6,7 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "19.10.0"
 
-  cluster_name    = local.name
+  cluster_name    = var.name
   cluster_version = "1.24"
 
   vpc_id     = module.vpc.vpc_id
@@ -19,7 +19,7 @@ module "eks" {
       subnet_ids      = module.vpc.private_subnets
     }
   }
-  cluster_endpoint_public_access = false
+  cluster_endpoint_public_access = true
   cluster_enabled_log_types      = ["audit", "api", "authenticator", "scheduler", "controllerManager"]
 }
 
@@ -97,12 +97,12 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 3.0"
 
-  name = local.name
-  cidr = local.vpc_cidr
+  name = var.name
+  cidr = var.vpc_cidr
 
   azs             = local.azs
-  public_subnets  = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k)]
-  private_subnets = [for k, v in local.azs : cidrsubnet(local.vpc_cidr, 8, k + 10)]
+  public_subnets  = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k)]
+  private_subnets = [for k, v in local.azs : cidrsubnet(var.vpc_cidr, 8, k + 10)]
 
   enable_nat_gateway   = true
   single_nat_gateway   = true
@@ -110,20 +110,20 @@ module "vpc" {
 
   # Manage so we can name
   manage_default_network_acl    = true
-  default_network_acl_tags      = { Name = "${local.name}-default" }
+  default_network_acl_tags      = { Name = "${var.name}-default" }
   manage_default_route_table    = true
-  default_route_table_tags      = { Name = "${local.name}-default" }
+  default_route_table_tags      = { Name = "${var.name}-default" }
   manage_default_security_group = true
-  default_security_group_tags   = { Name = "${local.name}-default" }
+  default_security_group_tags   = { Name = "${var.name}-default" }
 
   public_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
-    "kubernetes.io/role/elb"              = 1
+    "kubernetes.io/cluster/${var.name}" = "shared"
+    "kubernetes.io/role/elb"            = 1
   }
 
   private_subnet_tags = {
-    "kubernetes.io/cluster/${local.name}" = "shared"
-    "kubernetes.io/role/internal-elb"     = 1
+    "kubernetes.io/cluster/${var.name}" = "shared"
+    "kubernetes.io/role/internal-elb"   = 1
   }
 
   map_public_ip_on_launch = false
