@@ -36,7 +36,7 @@ locals {
 ################################################################################
 
 module "admin_team" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams?ref=v0.1.0"
 
   name = "admin-team"
 
@@ -48,7 +48,7 @@ module "admin_team" {
 }
 
 module "red_team" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams?ref=v0.1.0"
 
   name = "red-team"
 
@@ -167,7 +167,7 @@ module "red_team" {
 }
 
 module "blue_teams" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams?ref=v0.1.0"
 
   for_each = {
     one = {}
