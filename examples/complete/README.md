@@ -79,4 +79,4 @@ No inputs.
 | <a name="output_red_team_rbac_group"></a> [red\_team\_rbac\_group](#output\_red\_team\_rbac\_group) | The name of the Kubernetes RBAC group |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
-Apache-2.0 Licensed. See [LICENSE](https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy/blob/main/LICENSE).
+Apache-2.0 Licensed. See [LICENSE](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/LICENSE)

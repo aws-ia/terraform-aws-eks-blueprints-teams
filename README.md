@@ -4,14 +4,14 @@ Terraform module which creates AWS Eks Multi Tenancy resources.
 
 ## Usage
 
-See [`examples`](https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy/tree/main/examples) directory for working examples to reference:
+See [`examples`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/examples) directory for working examples to reference:
 
 
 ### Standalone - Admin Team
 
 ```hcl
 module "admin_team" {
-  source = "clowdhaus/eks-multi-tenancy/aws"
+  source = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
 
   name = "admin-team"
 
@@ -30,7 +30,7 @@ module "admin_team" {
 
 ```hcl
 module "development_team" {
-  source = "clowdhaus/eks-multi-tenancy/aws"
+  source = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
 
   name = "development-team"
 
@@ -162,7 +162,7 @@ You can utilize a module level `for_each` to create multiple teams with the same
 
 ```hcl
 module "development_team" {
-  source = "clowdhaus/eks-multi-tenancy/aws"
+  source = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
 
   for_each = {
     one = {
@@ -248,9 +248,9 @@ module "development_team" {
 
 ## Examples
 
-Examples codified under the [`examples`](https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy/tree/main/examples) are intended to give users references for how to use the module(s) as well as testing/validating changes to the source code of the module. If contributing to the project, please be sure to make any appropriate updates to the relevant examples to allow maintainers to test your changes and to keep the examples up to date for users. Thank you!
+Examples codified under the [`examples`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/examples) are intended to give users references for how to use the module(s) as well as testing/validating changes to the source code of the module. If contributing to the project, please be sure to make any appropriate updates to the relevant examples to allow maintainers to test your changes and to keep the examples up to date for users. Thank you!
 
-- [Complete](https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy/tree/main/examples/complete)
+- [Complete](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/examples/complete)
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
@@ -335,4 +335,4 @@ No modules.
 
 ## License
 
-Apache-2.0 Licensed. See [LICENSE](https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy/blob/main/LICENSE).
+Apache-2.0 Licensed. See [LICENSE](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/LICENSE)

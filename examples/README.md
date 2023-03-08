@@ -1,3 +1,3 @@
 # Terraform AWS EKS Multi-Tenancy Examples
 
-- [Complete](https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy/tree/main/examples/complete)
+- [Complete](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/examples/complete)
