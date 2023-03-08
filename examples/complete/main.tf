@@ -27,7 +27,7 @@ locals {
   tags = {
     Name       = local.name
     Example    = local.name
-    Repository = "https://github.com/clowdhaus/terraform-aws-eks-multi-tenancy"
+    Repository = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
   }
 }
 
