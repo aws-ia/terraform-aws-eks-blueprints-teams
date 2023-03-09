@@ -18,8 +18,8 @@ data "aws_availability_zones" "available" {}
 data "aws_caller_identity" "current" {}
 
 locals {
-  region = "us-east-1"
-  name   = "eks-multi-tenancy-ex-${basename(path.cwd)}"
+  region = "us-west-2"
+  name   = "ex-teams-${basename(path.cwd)}"
 
   vpc_cidr = "10.0.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -36,7 +36,7 @@ locals {
 ################################################################################
 
 module "admin_team" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams?ref=v0.1.0"
+  source = "../.."
 
   name = "admin-team"
 
@@ -48,7 +48,7 @@ module "admin_team" {
 }
 
 module "red_team" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams?ref=v0.1.0"
+  source = "../.."
 
   name = "red-team"
 
@@ -167,7 +167,7 @@ module "red_team" {
 }
 
 module "blue_teams" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints-teams?ref=v0.1.0"
+  source = "../.."
 
   for_each = {
     one = {}
@@ -214,13 +214,6 @@ module "eks" {
   cluster_name                   = local.name
   cluster_version                = "1.24"
   cluster_endpoint_public_access = true
-
-  # EKS Addons
-  cluster_addons = {
-    coredns    = {}
-    kube-proxy = {}
-    vpc-cni    = {}
-  }
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
