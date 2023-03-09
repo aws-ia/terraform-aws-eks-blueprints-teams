@@ -3,7 +3,7 @@
 Configuration in this directory creates:
 
 - An EKS cluster for demonstration
-- An adminstrative team
+- An administrative team
 - A red team which demonstrates creating one team per module definition
 - Blue teams which demonstrates creating multiple teams per module definition
 
@@ -38,10 +38,10 @@ Note that this example may create resources which will incur monetary charges on
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_admin_team"></a> [admin\_team](#module\_admin\_team) | github.com/aws-ia/terraform-aws-eks-blueprints-teams | v0.1.0 |
-| <a name="module_blue_teams"></a> [blue\_teams](#module\_blue\_teams) | github.com/aws-ia/terraform-aws-eks-blueprints-teams | v0.1.0 |
+| <a name="module_admin_team"></a> [admin\_team](#module\_admin\_team) | ../.. | n/a |
+| <a name="module_blue_teams"></a> [blue\_teams](#module\_blue\_teams) | ../.. | n/a |
 | <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 19.10 |
-| <a name="module_red_team"></a> [red\_team](#module\_red\_team) | github.com/aws-ia/terraform-aws-eks-blueprints-teams | v0.1.0 |
+| <a name="module_red_team"></a> [red\_team](#module\_red\_team) | ../.. | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 3.0 |
 
 ## Resources
