@@ -338,68 +338,26 @@ resource "kubernetes_cluster_role_binding_v1" "this" {
 }
 
 ################################################################################
-# K8s Role
-
-# Note: we are using a cluster role but using a role binding
-# this allows us to have one role but bind it to n-number of namespaces.
-# Just because its a clsuter role does not mean it has cluster access, its all
-# determined by the role binding.
+# K8s Role Binding
 ################################################################################
-
-resource "kubernetes_cluster_role_v1" "namespaced" {
-  count = var.create_role && !var.enable_admin ? 1 : 0
-
-  metadata {
-    name        = coalesce(var.role_name, var.name)
-    annotations = var.annotations
-    labels      = var.labels
-  }
-
-  rule {
-    api_groups = ["*"]
-
-    resources = [
-      "configmaps",
-      "pods",
-      "podtemplates",
-      "secrets",
-      "serviceaccounts",
-      "services",
-      "deployments",
-      "horizontalpodautoscalers",
-      "networkpolicies",
-      "statefulsets",
-      "replicasets",
-    ]
-
-    verbs = [
-      "get",
-      "list",
-      "watch",
-    ]
-  }
-
-  rule {
-    api_groups = ["*"]
-    resources  = ["resourcequotas"]
-    verbs      = ["get", "list", "watch"]
-  }
-}
 
 resource "kubernetes_role_binding_v1" "this" {
   for_each = { for k, v in var.namespaces : k => v if var.create_role && !var.enable_admin }
 
   metadata {
-    name        = "${kubernetes_cluster_role_v1.namespaced[0].metadata[0].name}-${each.key}"
+    name        = "${coalesce(var.role_name, var.name)}-${each.key}"
     namespace   = each.key
     annotations = var.annotations
     labels      = var.labels
   }
-
+  # Note: We are using a cluster role but using a role binding
+  # this allows us to have one role but bind it to n-number of namespaces.
+  # Just because its a cluster role does not mean it has cluster access, its all
+  # determined by the fact that this is a role binding (kubernetes_role_binding_v1).
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.namespaced[0].metadata[0].name
+    name      = "view"
   }
 
   subject {
