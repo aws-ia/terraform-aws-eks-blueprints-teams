@@ -1,6 +1,6 @@
 # AWS EKS Multi-Tenancy Terraform module
 
-Terraform module which creates AWS Eks Multi Tenancy resources.
+Terraform module which creates EKS Multi-Tenancy resources.
 
 ## Usage
 
