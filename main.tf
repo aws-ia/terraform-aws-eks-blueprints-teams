@@ -346,7 +346,7 @@ resource "kubernetes_role_binding_v1" "this" {
 
   metadata {
     name        = "${coalesce(var.role_name, var.name)}-${each.key}"
-    namespace   = each.key
+    namespace   = try(each.value.create, true) ? kubernetes_namespace_v1.this[each.key].metadata[0].name : each.key
     annotations = var.annotations
     labels      = var.labels
   }
@@ -364,7 +364,7 @@ resource "kubernetes_role_binding_v1" "this" {
     kind      = "Group"
     name      = var.name
     api_group = "rbac.authorization.k8s.io"
-    namespace = each.key
+    namespace = try(each.value.create, true) ? kubernetes_namespace_v1.this[each.key].metadata[0].name : each.key
   }
 }
 
