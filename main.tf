@@ -204,7 +204,7 @@ resource "kubernetes_service_account_v1" "this" {
     for_each = try(each.value.service_account.image_pull_secrets, [])
 
     content {
-      name = secret.value.name
+      name = image_pull_secret.value.name
     }
   }
 
