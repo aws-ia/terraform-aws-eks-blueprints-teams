@@ -200,6 +200,14 @@ resource "kubernetes_service_account_v1" "this" {
     labels = merge(var.labels, try(each.value.service_account.labels, {}))
   }
 
+  dynamic "image_pull_secret" {
+    for_each = try(each.value.service_account.image_pull_secrets, [])
+
+    content {
+      name = secret.value.name
+    }
+  }
+
   dynamic "secret" {
     for_each = try(each.value.service_account.secrets, [])
 
