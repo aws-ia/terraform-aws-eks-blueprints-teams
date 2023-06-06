@@ -1,8 +1,8 @@
-# Complete AWS EKS Multi-Tenancy Example
+# Amazon EKS Blueprints Teams - Complete
 
 Configuration in this directory creates:
 
-- An EKS cluster for demonstration
+- An EKS cluster (required to support module/tests)
 - An administrative team
 - A red team which demonstrates creating one team per module definition
 - Blue teams which demonstrates creating multiple teams per module definition

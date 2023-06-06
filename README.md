@@ -1,6 +1,6 @@
-# AWS EKS Multi-Tenancy Terraform module
+# Amazon EKS Blueprints Teams Terraform module
 
-Terraform module which creates EKS Multi-Tenancy resources.
+Terraform module which creates multi-tenancy resources on Amazon EKS.
 
 ## Usage
 
