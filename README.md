@@ -11,7 +11,7 @@ See [`tests`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/
 
 ```hcl
 module "admin_team" {
-  source = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
+  source = "aws-ia/eks-blueprints-teams/aws"
 
   name = "admin-team"
 
@@ -30,7 +30,7 @@ module "admin_team" {
 
 ```hcl
 module "development_team" {
-  source = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
+  source = "aws-ia/eks-blueprints-teams/aws"
 
   name = "development-team"
 
@@ -38,7 +38,7 @@ module "development_team" {
   cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
   oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
 
-  # Lables applied to all Kubernetes resources
+  # Labels applied to all Kubernetes resources
   # More specific labels can be applied to individual resources under `namespaces` below
   labels = {
     team = "development"
@@ -162,7 +162,7 @@ You can utilize a module level `for_each` to create multiple teams with the same
 
 ```hcl
 module "development_team" {
-  source = "https://github.com/aws-ia/terraform-aws-eks-blueprints-teams"
+  source = "aws-ia/eks-blueprints-teams/aws"
 
   for_each = {
     one = {
@@ -183,7 +183,7 @@ module "development_team" {
   cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
   oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
 
-  # Lables applied to all Kubernetes resources
+  # Labels applied to all Kubernetes resources
   # More specific labels can be applied to individual resources under `namespaces` below
   labels = {
     team = each.key
