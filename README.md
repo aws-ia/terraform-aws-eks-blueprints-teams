@@ -322,7 +322,7 @@ No modules.
 | <a name="output_iam_role_arn"></a> [iam\_role\_arn](#output\_iam\_role\_arn) | The Amazon Resource Name (ARN) specifying the IAM role |
 | <a name="output_iam_role_name"></a> [iam\_role\_name](#output\_iam\_role\_name) | The name of the IAM role |
 | <a name="output_iam_role_unique_id"></a> [iam\_role\_unique\_id](#output\_iam\_role\_unique\_id) | Stable and unique string identifying the IAM role |
-| <a name="output_namespaces"></a> [namespaces](#output\_namespaces) | Mapf of Kubernetes namespaces created and their attributes |
+| <a name="output_namespaces"></a> [namespaces](#output\_namespaces) | Map of Kubernetes namespaces created and their attributes |
 | <a name="output_rbac_group"></a> [rbac\_group](#output\_rbac\_group) | The name of the Kubernetes RBAC group |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
