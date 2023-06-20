@@ -3,7 +3,7 @@
 ################################################################################
 
 output "namespaces" {
-  description = "Mapf of Kubernetes namespaces created and their attributes"
+  description = "Map of Kubernetes namespaces created and their attributes"
   value       = kubernetes_namespace_v1.this
 }
 
