@@ -395,6 +395,16 @@ data "aws_iam_policy_document" "this" {
       type        = "AWS"
       identifiers = var.users
     }
+
+    dynamic "condition" {
+      for_each = length(var.principal_arns) > 0 ? [1] : []
+
+      content {
+        test     = "ArnLike"
+        variable = "aws:PrincipalArn"
+        values   = var.principal_arns
+      }
+    }
   }
 
   # IRSA
