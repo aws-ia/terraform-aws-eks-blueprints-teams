@@ -303,6 +303,33 @@ resource "kubernetes_limit_range_v1" "this" {
 }
 
 ################################################################################
+# K8s Admin ClusterRole Binding
+################################################################################
+
+resource "kubernetes_cluster_role_binding_v1" "admin" {
+  count = var.create_cluster_role && var.enable_admin ? 1 : 0
+
+  metadata {
+    name        = "${coalesce(var.role_name, var.name)}"
+    annotations = var.annotations
+    labels      = var.labels
+  }
+
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+
+  subject {
+    kind      = "Group"
+    name      = var.name
+    api_group = "rbac.authorization.k8s.io"
+    namespace = ""
+  }
+}
+
+################################################################################
 # K8s Cluster Role
 ################################################################################
 
@@ -321,6 +348,10 @@ resource "kubernetes_cluster_role_v1" "this" {
     verbs      = ["get", "list", "watch"]
   }
 }
+
+################################################################################
+# K8s ClusterRole Binding
+################################################################################
 
 resource "kubernetes_cluster_role_binding_v1" "this" {
   count = var.create_cluster_role && !var.enable_admin ? 1 : 0

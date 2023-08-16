@@ -13,7 +13,7 @@ output "namespaces" {
 
 output "rbac_group" {
   description = "The name of the Kubernetes RBAC group"
-  value       = var.enable_admin ? "system:masters" : var.name
+  value       = var.enable_admin ? "admin-team" : var.name
 }
 
 output "aws_auth_configmap_role" {
@@ -21,7 +21,7 @@ output "aws_auth_configmap_role" {
   value = {
     rolearn  = try(aws_iam_role.this[0].arn, var.iam_role_arn)
     username = var.name
-    groups   = [var.enable_admin ? "system:masters" : var.name]
+    groups   = [var.enable_admin ? "admin-team" : var.name]
   }
 }
 
