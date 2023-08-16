@@ -129,6 +129,12 @@ variable "users" {
   default     = []
 }
 
+variable "principal_arns" {
+  description = "A list of IAM principal arns to support passing wildcards for AWS Identity Center (SSO) roles. [Reference](https://docs.aws.amazon.com/singlesignon/latest/userguide/referencingpermissionsets.html#custom-trust-policy-example)"
+  type        = list(string)
+  default     = []
+}
+
 variable "oidc_provider_arn" {
   description = "ARN of the OIDC provider created by the EKS cluster"
   type        = string

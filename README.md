@@ -310,6 +310,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | A common name used across resources created unless a more specific resource name is provdied | `string` | `""` | no |
 | <a name="input_namespaces"></a> [namespaces](#input\_namespaces) | A map of Kubernetes namespace definitions to create | `any` | `{}` | no |
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | ARN of the OIDC provider created by the EKS cluster | `string` | `""` | no |
+| <a name="input_principal_arns"></a> [principal\_arns](#input\_principal\_arns) | A list of IAM principal arns to support passing wildcards for AWS Identity Center (SSO) roles. [Reference](https://docs.aws.amazon.com/singlesignon/latest/userguide/referencingpermissionsets.html#custom-trust-policy-example) | `list(string)` | `[]` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name to use on Kubernetes role created | `string` | `""` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all AWS resources | `map(string)` | `{}` | no |
 | <a name="input_users"></a> [users](#input\_users) | A list of IAM user and/or role ARNs that can assume the IAM role created | `list(string)` | `[]` | no |
