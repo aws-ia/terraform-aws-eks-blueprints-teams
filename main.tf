@@ -310,7 +310,7 @@ resource "kubernetes_cluster_role_binding_v1" "admin" {
   count = var.create_cluster_role && var.enable_admin ? 1 : 0
 
   metadata {
-    name        = "${coalesce(var.role_name, var.name)}"
+    name        = coalesce(var.role_name, var.name)
     annotations = var.annotations
     labels      = var.labels
   }
@@ -318,7 +318,7 @@ resource "kubernetes_cluster_role_binding_v1" "admin" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = "cluster-admin"
+    name      = "admin"
   }
 
   subject {
