@@ -316,12 +316,15 @@ resource "kubernetes_cluster_role_v1" "this" {
   }
 
   rule {
-    api_groups = [""]
-    resources  = ["namespaces", "nodes"]
-    verbs      = ["get", "list", "watch"]
+    api_groups = try(var.cluster_role_rule.api_groups, [""])
+    resources  = try(var.cluster_role_rule.resources, ["namespaces", "nodes"])
+    verbs      = try(var.cluster_role_rule.verbs, ["get", "list", "watch"])
   }
 }
 
+################################################################################
+# K8s Cluster Role Binding
+################################################################################
 resource "kubernetes_cluster_role_binding_v1" "this" {
   count = var.create_cluster_role && !var.enable_admin ? 1 : 0
 
@@ -334,7 +337,7 @@ resource "kubernetes_cluster_role_binding_v1" "this" {
   role_ref {
     api_group = "rbac.authorization.k8s.io"
     kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.this[0].metadata[0].name
+    name      = try(var.cluster_role_ref_name == "") ? kubernetes_cluster_role_v1.this[0].metadata[0].name : var.cluster_role_ref_name
   }
 
   subject {
@@ -364,8 +367,8 @@ resource "kubernetes_role_binding_v1" "this" {
   # determined by the fact that this is a role binding (kubernetes_role_binding_v1).
   role_ref {
     api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "view"
+    kind      = try(var.role_ref.kind, "ClusterRole")
+    name      = try(var.role_ref.name, "view")
   }
 
   subject {

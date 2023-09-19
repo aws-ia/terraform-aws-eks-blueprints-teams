@@ -294,6 +294,8 @@ No modules.
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | A map of Kubernetes annotations to add to all resources | `map(string)` | `{}` | no |
 | <a name="input_cluster_arn"></a> [cluster\_arn](#input\_cluster\_arn) | The Amazon Resource Name (ARN) of the cluster | `string` | `""` | no |
 | <a name="input_cluster_role_name"></a> [cluster\_role\_name](#input\_cluster\_role\_name) | Name to use on Kubernetes cluster role created | `string` | `""` | no |
+| <a name="input_cluster_role_ref_name"></a> [cluster\_role\_ref\_name](#input\_cluster\_role\_ref\_name) | Name of an existing ClusterRole to be referenced on the Kubernetes clusterRoleBinding created | `string` | `""` | no |
+| <a name="input_cluster_role_rule"></a> [cluster\_role\_rule](#input\_cluster\_role\_rule) | Defines the Kubernetes RBAC based `api_groups`, `resources`, and `verbs` Rules for the role created | `any` | `{}` | no |
 | <a name="input_create_cluster_role"></a> [create\_cluster\_role](#input\_create\_cluster\_role) | Determines whether a Kubernetes cluster role is created | `bool` | `true` | no |
 | <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role) | Determines whether an IAM role is created or to use an existing IAM role | `bool` | `true` | no |
 | <a name="input_create_role"></a> [create\_role](#input\_create\_role) | Determines whether a Kubernetes role is created. Note: the role created is a cluster role but its bound to only namespaced role bindings | `bool` | `true` | no |
@@ -312,6 +314,7 @@ No modules.
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | ARN of the OIDC provider created by the EKS cluster | `string` | `""` | no |
 | <a name="input_principal_arns"></a> [principal\_arns](#input\_principal\_arns) | A list of IAM principal arns to support passing wildcards for AWS Identity Center (SSO) roles. [Reference](https://docs.aws.amazon.com/singlesignon/latest/userguide/referencingpermissionsets.html#custom-trust-policy-example) | `list(string)` | `[]` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name to use on Kubernetes role created | `string` | `""` | no |
+| <a name="input_role_ref"></a> [role\_ref](#input\_role\_ref) | Defines the reference for an existing Kubernetes role | `any` | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all AWS resources | `map(string)` | `{}` | no |
 | <a name="input_users"></a> [users](#input\_users) | A list of IAM user and/or role ARNs that can assume the IAM role created | `list(string)` | `[]` | no |
 

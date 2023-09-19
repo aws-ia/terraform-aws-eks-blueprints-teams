@@ -48,8 +48,20 @@ variable "cluster_role_name" {
   default     = ""
 }
 
+variable "cluster_role_ref_name" {
+  description = "Name of an existing ClusterRole to be referenced on the Kubernetes clusterRoleBinding created"
+  type        = string
+  default     = ""
+}
+
+variable "cluster_role_rule" {
+  description = "Defines the Kubernetes RBAC based `api_groups`, `resources`, and `verbs` Rules for the role created"
+  type        = any
+  default     = {}
+}
+
 ################################################################################
-# K8s Cluster Role
+# K8s Role
 ################################################################################
 
 variable "create_role" {
@@ -64,6 +76,11 @@ variable "role_name" {
   default     = ""
 }
 
+variable "role_ref" {
+  description = "Defines the reference for an existing Kubernetes role"
+  type        = any
+  default     = {}
+}
 ################################################################################
 # IAM Role
 ################################################################################
