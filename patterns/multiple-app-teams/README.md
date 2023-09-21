@@ -24,7 +24,8 @@ Configuration in this directory creates:
 
 - A VPC (required to support module/eks)
 - An EKS cluster (required to support module/teams)
-- Creation of two teams with restricted privileges inside their specific Namespaces, and no access to each other Namespaces. Read-only access to list Namespaces and Nodes
+- Creation of two teams with restricted privileges inside their specific Namespaces, and no access to each other Namespaces.
+- Read-only access to list Namespaces and Nodes for each team.
 
 To run this pattern you need to execute:
 
