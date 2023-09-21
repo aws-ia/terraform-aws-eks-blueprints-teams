@@ -4,29 +4,18 @@ Terraform module which creates multi-tenancy resources on Amazon EKS.
 
 ## Usage
 
-See [`tests`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/test) directory for working tests to reference:
+See [`patterns`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns) directory for working tests to reference:
 
 
-### Standalone - Admin Team
+### Cluster Admin
 
-```hcl
-module "admin_team" {
-  source = "aws-ia/eks-blueprints-teams/aws"
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/3011726aa7609fa201be8021ecfc2202bda47c8d/patterns/cluster-admin/main.tf#L38-L49
 
-  name = "admin-team"
+### Namespaced Admin
 
-  # Enables elevated, admin privileges for this team
-  enable_admin = true
-  users        = ["arn:aws:iam::111122223333:role/my-admin-role"]
-  cluster_arn  = "arn:aws:eks:us-west-2:111122223333:cluster/my-cluster"
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/3011726aa7609fa201be8021ecfc2202bda47c8d/patterns/cluster-admin/main.tf#L38-L49
 
-  tags = {
-    Environment = "dev"
-  }
-}
-```
-
-### Standalone - Developer Team
+### Developer Team
 
 ```hcl
 module "development_team" {

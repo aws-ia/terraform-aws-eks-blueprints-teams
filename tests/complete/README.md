@@ -41,6 +41,7 @@ Note that this example may create resources which will incur monetary charges on
 | <a name="module_admin_team"></a> [admin\_team](#module\_admin\_team) | ../.. | n/a |
 | <a name="module_blue_teams"></a> [blue\_teams](#module\_blue\_teams) | ../.. | n/a |
 | <a name="module_eks"></a> [eks](#module\_eks) | terraform-aws-modules/eks/aws | ~> 19.13 |
+| <a name="module_platform_team"></a> [platform\_team](#module\_platform\_team) | ../.. | n/a |
 | <a name="module_red_team"></a> [red\_team](#module\_red\_team) | ../.. | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | terraform-aws-modules/vpc/aws | ~> 5.0 |
 
@@ -71,6 +72,12 @@ No inputs.
 | <a name="output_blue_teams_iam_role_unique_id"></a> [blue\_teams\_iam\_role\_unique\_id](#output\_blue\_teams\_iam\_role\_unique\_id) | Stable and unique string identifying the IAM role |
 | <a name="output_blue_teams_namespaces"></a> [blue\_teams\_namespaces](#output\_blue\_teams\_namespaces) | Mapf of Kubernetes namespaces created and their attributes |
 | <a name="output_blue_teams_rbac_group"></a> [blue\_teams\_rbac\_group](#output\_blue\_teams\_rbac\_group) | The name of the Kubernetes RBAC group |
+| <a name="output_platform_team_aws_auth_configmap_role"></a> [platform\_team\_aws\_auth\_configmap\_role](#output\_platform\_team\_aws\_auth\_configmap\_role) | Dictionary containing the necessary details for adding the role created to the `aws-auth` configmap |
+| <a name="output_platform_team_iam_role_arn"></a> [platform\_team\_iam\_role\_arn](#output\_platform\_team\_iam\_role\_arn) | The Amazon Resource Name (ARN) specifying the IAM role |
+| <a name="output_platform_team_iam_role_name"></a> [platform\_team\_iam\_role\_name](#output\_platform\_team\_iam\_role\_name) | The name of the IAM role |
+| <a name="output_platform_team_iam_role_unique_id"></a> [platform\_team\_iam\_role\_unique\_id](#output\_platform\_team\_iam\_role\_unique\_id) | Stable and unique string identifying the IAM role |
+| <a name="output_platform_team_namespaces"></a> [platform\_team\_namespaces](#output\_platform\_team\_namespaces) | Mapf of Kubernetes namespaces created and their attributes |
+| <a name="output_platform_team_rbac_group"></a> [platform\_team\_rbac\_group](#output\_platform\_team\_rbac\_group) | The name of the Kubernetes RBAC group |
 | <a name="output_red_team_aws_auth_configmap_role"></a> [red\_team\_aws\_auth\_configmap\_role](#output\_red\_team\_aws\_auth\_configmap\_role) | Dictionary containing the necessary details for adding the role created to the `aws-auth` configmap |
 | <a name="output_red_team_iam_role_arn"></a> [red\_team\_iam\_role\_arn](#output\_red\_team\_iam\_role\_arn) | The Amazon Resource Name (ARN) specifying the IAM role |
 | <a name="output_red_team_iam_role_name"></a> [red\_team\_iam\_role\_name](#output\_red\_team\_iam\_role\_name) | The name of the IAM role |

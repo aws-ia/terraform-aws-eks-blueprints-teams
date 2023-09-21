@@ -32,36 +32,24 @@ locals {
 }
 
 ################################################################################
-# EKS Multi-Tenancy Module
+# EKS Development Teams Module
 ################################################################################
 
-module "admin_team" {
+module "development_team" {
   source = "../.."
 
-  name = "admin-team"
-
-  enable_admin = true
-  users        = [data.aws_caller_identity.current.arn]
-  cluster_arn  = module.eks.cluster_arn
-
-  tags = local.tags
-}
-
-module "red_team" {
-  source = "../.."
-
-  name = "red-team"
+  name = "development-team"
 
   users             = [data.aws_caller_identity.current.arn]
   cluster_arn       = module.eks.cluster_arn
   oidc_provider_arn = module.eks.oidc_provider_arn
 
   labels = {
-    team = "red"
+    team = "dev"
   }
 
   annotations = {
-    team = "red"
+    team = "dev"
   }
 
   namespaces = {
@@ -69,9 +57,10 @@ module "red_team" {
       # Provides access to an existing namespace
       create = false
     }
-    red = {
+    app = {
+
       labels = {
-        projectName = "project-red",
+        projectName = "project-app",
       }
 
       resource_quota = {
@@ -166,43 +155,6 @@ module "red_team" {
   tags = local.tags
 }
 
-module "blue_teams" {
-  source = "../.."
-
-  for_each = {
-    one = {}
-    two = {}
-  }
-  name = "blue-team-${each.key}"
-
-  users             = [data.aws_caller_identity.current.arn]
-  cluster_arn       = module.eks.cluster_arn
-  oidc_provider_arn = module.eks.oidc_provider_arn
-
-  namespaces = {
-    "blue-${each.key}" = {
-      labels = {
-        appName     = "blue-team-app",
-        projectName = "project-blue",
-      }
-
-      resource_quota = {
-        hard = {
-          "requests.cpu"    = "2000m",
-          "requests.memory" = "4Gi",
-          "limits.cpu"      = "4000m",
-          "limits.memory"   = "16Gi",
-          "pods"            = "20",
-          "secrets"         = "20",
-          "services"        = "20"
-        }
-      }
-    }
-  }
-
-  tags = local.tags
-}
-
 ################################################################################
 # Supporting Resources
 ################################################################################
@@ -231,9 +183,7 @@ module "eks" {
   manage_aws_auth_configmap = true
   aws_auth_roles = flatten(
     [
-      module.admin_team.aws_auth_configmap_role,
-      module.red_team.aws_auth_configmap_role,
-      [for team in module.blue_teams : team.aws_auth_configmap_role],
+      module.development_team.aws_auth_configmap_role,
     ]
   )
 
