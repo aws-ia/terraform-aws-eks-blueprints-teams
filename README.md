@@ -4,236 +4,25 @@ Terraform module which creates multi-tenancy resources on Amazon EKS.
 
 ## Usage
 
-See [`patterns`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns) directory for working tests to reference:
-
+See [`patterns`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns) directory for working references.
 
 ### Cluster Admin
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/3011726aa7609fa201be8021ecfc2202bda47c8d/patterns/cluster-admin/main.tf#L38-L49
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L38-L49
 
 ### Namespaced Admin
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/3011726aa7609fa201be8021ecfc2202bda47c8d/patterns/cluster-admin/main.tf#L38-L49
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L50-L76
 
-### Developer Team
+### Single Development Team
 
-```hcl
-module "development_team" {
-  source = "aws-ia/eks-blueprints-teams/aws"
-
-  name = "development-team"
-
-  users             = ["arn:aws:iam::012345678901:role/my-developer"]
-  cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
-  oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
-
-  # Labels applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  labels = {
-    team = "development"
-  }
-
-  # Annotations applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  annotations = {
-    team = "development"
-  }
-
-  namespaces = {
-    default = {
-      # Provides access to an existing namespace
-      create = false
-    }
-
-    development = {
-      labels = {
-        projectName = "project-awesome",
-      }
-
-      resource_quota = {
-        hard = {
-          "requests.cpu"    = "1000m",
-          "requests.memory" = "4Gi",
-          "limits.cpu"      = "2000m",
-          "limits.memory"   = "8Gi",
-          "pods"            = "10",
-          "secrets"         = "10",
-          "services"        = "10"
-        }
-      }
-
-      limit_range = {
-        limit = [
-          {
-            type = "Pod"
-            max = {
-              cpu    = "200m"
-              memory = "1Gi"
-            }
-          },
-          {
-            type = "PersistentVolumeClaim"
-            min = {
-              storage = "24M"
-            }
-          },
-          {
-            type = "Container"
-            default = {
-              cpu    = "50m"
-              memory = "24Mi"
-            }
-          }
-        ]
-      }
-
-      network_policy = {
-        pod_selector = {
-          match_expressions = [{
-            key      = "name"
-            operator = "In"
-            values   = ["webfront", "api"]
-          }]
-        }
-
-        ingress = [{
-          ports = [
-            {
-              port     = "http"
-              protocol = "TCP"
-            },
-            {
-              port     = "53"
-              protocol = "TCP"
-            },
-            {
-              port     = "53"
-              protocol = "UDP"
-            }
-          ]
-
-          from = [
-            {
-              namespace_selector = {
-                match_labels = {
-                  name = "default"
-                }
-              }
-            },
-            {
-              ip_block = {
-                cidr = "10.0.0.0/8"
-                except = [
-                  "10.0.0.0/24",
-                  "10.0.1.0/24",
-                ]
-              }
-            }
-          ]
-        }]
-
-        egress = [] # single empty rule to allow all egress traffic
-
-        policy_types = ["Ingress", "Egress"]
-      }
-    }
-  }
-
-  tags = {
-    Environment = "dev"
-  }
-}
-```
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L77-L195
 
 ### Multiple Teams
 
-You can utilize a module level `for_each` to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden.
+You can utilize a the Terraform `for_each` Meta-Argument at the Module level to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden.
 
-```hcl
-module "development_team" {
-  source = "aws-ia/eks-blueprints-teams/aws"
-
-  for_each = {
-    one = {
-      # Add any additional variables here and update definition below to use
-      users = ["arn:aws:iam::012345678901:role/developers-one"]
-    }
-    two = {
-      users = ["arn:aws:iam::012345678901:role/developers-two"]
-    }
-    three = {
-      users = ["arn:aws:iam::012345678901:role/developers-three"]
-    }
-  }
-
-  name = "${each.key}-team"
-
-  users             = each.value.users
-  cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
-  oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
-
-  # Labels applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  labels = {
-    team = each.key
-  }
-
-  # Annotations applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  annotations = {
-    team = each.key
-  }
-
-  namespaces = {
-    (each.key) = {
-      labels = {
-        projectName = "project-awesome",
-      }
-
-      resource_quota = {
-        hard = {
-          "requests.cpu"    = "1000m",
-          "requests.memory" = "4Gi",
-          "limits.cpu"      = "2000m",
-          "limits.memory"   = "8Gi",
-          "pods"            = "10",
-          "secrets"         = "10",
-          "services"        = "10"
-        }
-      }
-
-      limit_range = {
-        limit = [
-          {
-            type = "Pod"
-            max = {
-              cpu    = "200m"
-              memory = "1Gi"
-            }
-          },
-          {
-            type = "PersistentVolumeClaim"
-            min = {
-              storage = "24M"
-            }
-          },
-          {
-            type = "Container"
-            default = {
-              cpu    = "50m"
-              memory = "24Mi"
-            }
-          }
-        ]
-      }
-    }
-  }
-
-  tags = {
-    Environment = "dev"
-  }
-}
-```
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L196-L231
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
