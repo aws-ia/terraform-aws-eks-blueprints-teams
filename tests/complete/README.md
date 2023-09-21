@@ -1,10 +1,12 @@
-# Amazon EKS Blueprints Teams - Complete
+# Amazon EKS Blueprints Teams - Complete test
 
 Configuration in this directory creates:
 
-- An EKS cluster (required to support module/tests)
-- An administrative team
-- A red team which demonstrates creating one team per module definition
+- A VPC (required to support module/eks)
+- An EKS cluster (required to support module/teams)
+- An Administrative team with unrestricted access to cluster resources
+- A Platform team team with access to manage namespaced resources but **not** cluster-wide resources
+- A Red team which demonstrates creating one team per module definition
 - Blue teams which demonstrates creating multiple teams per module definition
 
 ## Usage
