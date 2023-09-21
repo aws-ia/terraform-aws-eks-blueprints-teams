@@ -1,17 +1,32 @@
-# Amazon EKS Blueprints Teams - Complete
+# Amazon EKS Blueprints Teams - Namespaced Admin
+
+This example shows how to create a team with Admin privileges on Namespaces the specified identities (`users/role`). For this to work, the created team will be tied to the `admin` Kubernetes Role in all Namespaces, this will give them permissions to manage resources inside the Namespaces, however it will **not** provide access to cluster-wide resources, for example manage Namespaces, Nodes, ClusterRoles, ClusterRoleBindings, and others.
+
+- RBAC Authorization for User-facing roles [documentation](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+- Namespaced vs. non-Namespaced objects [documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#not-all-objects-are-in-a-namespace)
+
+## Areas of Interest
+
+- `teams.tf` contains a sample configuration of the `teams` module, in this case providing namespaced `admin` privileges, and *read-only* access to Namespaces and Nodes for the specified identities.
+
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/namespaced-admin/teams.tf#L5-L31
+
+- `eks.tf` holds the EKS Cluster configuration and the setup of the `aws-auth` configMap, providing the EKS authentication model for the identities and RBAC authorization created by the `teams` module.
+
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/namespaced-admin/eks.tf#L28-L33
+
+## Deploy
 
 Configuration in this directory creates:
 
-- An EKS cluster (required to support module/tests)
-- An administrative team
-- A red team which demonstrates creating one team per module definition
-- Blue teams which demonstrates creating multiple teams per module definition
+- A VPC (required to support module/eks)
+- An EKS cluster (required to support module/teams)
+- A team with `admin` privileges inside Namespaces, but with read-only access to Namespaces and Nodes
 
-## Usage
-
-To run this example you need to execute:
+To run this pattern you need to execute:
 
 ```bash
+$ cd patterns/cluster-admin
 $ terraform init
 $ terraform plan
 $ terraform apply

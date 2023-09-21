@@ -19,7 +19,7 @@ data "aws_caller_identity" "current" {}
 
 locals {
   region = "us-west-2"
-  name   = "ex-teams-${basename(path.cwd)}"
+  name   = basename(path.cwd)
 
   vpc_cidr = "10.0.0.0/16"
   azs      = slice(data.aws_availability_zones.available.names, 0, 3)

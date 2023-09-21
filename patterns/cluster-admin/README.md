@@ -2,7 +2,7 @@
 
 This example shows how to create a team with Cluster Admin privileges for the specified identities (`users/role`). For this to work, the created team will be tied to the `system:masters` Kubernetes RBAC group, that will give them the *super-user* permissions, as defined in the `cluster-admin` Kubernetes clusterRole.
 
-- [RBAC Authorization for User-facing roles](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+- RBAC Authorization for User-facing roles [documentation](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
 
 ## Areas of Interest
 
