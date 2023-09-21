@@ -1,5 +1,5 @@
 ################################################################################
-# EKS Teams Module - Namespaced Admin
+# EKS Blueprints Teams Module - Namespaced Admin
 ################################################################################
 
 module "operations_team" {

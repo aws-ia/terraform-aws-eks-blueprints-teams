@@ -1,17 +1,35 @@
-# Amazon EKS Blueprints Teams - Complete
+# Amazon EKS Blueprints Teams - Namespaced Admin
+
+This example shows how to create a team with privileges restricted to the Namespaces it owns, allowing to specify fine grained permissions and resource access through the definition of Role's Resources, Verbs and API Groups using Kubernetes constructs, and also define LimitRanges, ResourceQuotas, amd NetworkPolicies. In this example, teams will have *read-only* access to list Namespaces and Nodes.
+
+- RBAC Authorization [documentation](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+- Namespaced vs. non-Namespaced objects [documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#not-all-objects-are-in-a-namespace)
+- Resource Quotas [documentation](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
+- Limit Ranges [documentation](https://kubernetes.io/docs/concepts/policy/limit-range/)
+- Network Policy [documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+
+## Areas of Interest
+
+- `teams.tf` contains a sample configuration of the `teams` module, in this case providing restricted access to specific Namespaces, and *read-only* access to list Namespaces and Nodes for the specified identities.
+
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/development-team/teams.tf#L5-L123
+
+- `eks.tf` holds the EKS Cluster configuration and the setup of the `aws-auth` configMap, providing the EKS authentication model for the identities and RBAC authorization created by the `teams` module.
+
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/development-team/eks.tf#L28-L33
+
+## Deploy
 
 Configuration in this directory creates:
 
-- An EKS cluster (required to support module/tests)
-- An administrative team
-- A red team which demonstrates creating one team per module definition
-- Blue teams which demonstrates creating multiple teams per module definition
+- A VPC (required to support module/eks)
+- An EKS cluster (required to support module/teams)
+- A team with `admin` privileges inside Namespaces, but with read-only access to Namespaces and Nodes
 
-## Usage
-
-To run this example you need to execute:
+To run this pattern you need to execute:
 
 ```bash
+$ cd patterns/cluster-admin
 $ terraform init
 $ terraform plan
 $ terraform apply
