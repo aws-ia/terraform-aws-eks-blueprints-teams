@@ -21,7 +21,7 @@ Configuration in this directory creates:
 
 - A VPC (required to support module/eks)
 - An EKS cluster (required to support module/teams)
-- A team with `admin` privileges inside Namespaces, but with read-only access to Namespaces and Nodes
+- A team with `admin` privileges inside Namespaces, but with read-only access to list Namespaces and Nodes
 
 To run this pattern you need to execute:
 

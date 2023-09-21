@@ -1,17 +1,35 @@
-# Amazon EKS Blueprints Teams - Complete
+# Amazon EKS Blueprints Teams - Multiple Application Teams
+
+This example shows how to create a multiple teams using the same approach of the [`patterns/development-team`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/development-team) pattern. Each team will be restricted to the Namespaces they own, together with fine grained permissions and resource access through the definition of Role's Resources, Verbs and API Groups using Kubernetes constructs, and also define LimitRanges, ResourceQuotas, amd NetworkPolicies for each one. In this example, teams will have *read-only* access to list Namespaces and Nodes.
+
+- RBAC Authorization [documentation](https://kubernetes.io/docs/reference/access-authn-authz/rbac/)
+- Namespaced vs. non-Namespaced objects [documentation](https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/#not-all-objects-are-in-a-namespace)
+- Resource Quotas [documentation](https://kubernetes.io/docs/concepts/policy/resource-quotas/)
+- Limit Ranges [documentation](https://kubernetes.io/docs/concepts/policy/limit-range/)
+- Network Policy [documentation](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
+
+## Areas of Interest
+
+- `teams.tf` contains a sample configuration of the `teams` module, using the `for_each` Terraform Meta-Argument at the Module level creating multiple teams with the same configuration, in this case providing restricted access to specific Namespaces, and *read-only* access to list Namespaces and Nodes for the specified identities.
+
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/multiple-app-teams/teams.tf#L5-L123
+
+- `eks.tf` holds the EKS Cluster configuration and the setup of the `aws-auth` configMap, providing the EKS authentication model for the identities and RBAC authorization created by the `teams` module.
+
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/multiple-app-teams/eks.tf#L28-L33
+
+## Deploy
 
 Configuration in this directory creates:
 
-- An EKS cluster (required to support module/tests)
-- An administrative team
-- A red team which demonstrates creating one team per module definition
-- Blue teams which demonstrates creating multiple teams per module definition
+- A VPC (required to support module/eks)
+- An EKS cluster (required to support module/teams)
+- Creation of two teams with restricted privileges inside their specific Namespaces, and no access to each other Namespaces. Read-only access to list Namespaces and Nodes
 
-## Usage
-
-To run this example you need to execute:
+To run this pattern you need to execute:
 
 ```bash
+$ cd patterns/cluster-admin
 $ terraform init
 $ terraform plan
 $ terraform apply

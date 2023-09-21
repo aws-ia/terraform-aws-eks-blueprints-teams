@@ -1,4 +1,4 @@
-# Amazon EKS Blueprints Teams - Namespaced Admin
+# Amazon EKS Blueprints Teams - Development Team
 
 This example shows how to create a team with privileges restricted to the Namespaces it owns, allowing to specify fine grained permissions and resource access through the definition of Role's Resources, Verbs and API Groups using Kubernetes constructs, and also define LimitRanges, ResourceQuotas, amd NetworkPolicies. In this example, teams will have *read-only* access to list Namespaces and Nodes.
 
@@ -24,7 +24,7 @@ Configuration in this directory creates:
 
 - A VPC (required to support module/eks)
 - An EKS cluster (required to support module/teams)
-- A team with `admin` privileges inside Namespaces, but with read-only access to Namespaces and Nodes
+- A team with restricted privileges inside Namespaces, and with read-only access to list Namespaces and Nodes
 
 To run this pattern you need to execute:
 
