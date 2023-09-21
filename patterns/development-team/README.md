@@ -12,11 +12,11 @@ This example shows how to create a team with privileges restricted to the Namesp
 
 - `teams.tf` contains a sample configuration of the `teams` module, in this case providing restricted access to specific Namespaces, and *read-only* access to list Namespaces and Nodes for the specified identities.
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/development-team/teams.tf#L5-L123
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/development-team/teams.tf#L5-L123
 
 - `eks.tf` holds the EKS Cluster configuration and the setup of the `aws-auth` configMap, providing the EKS authentication model for the identities and RBAC authorization created by the `teams` module.
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/development-team/eks.tf#L28-L33
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/development-team/eks.tf#L28-L33
 
 ## Deploy
 

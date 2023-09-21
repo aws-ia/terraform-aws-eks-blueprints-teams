@@ -9,11 +9,11 @@ This example shows how to create a team with Admin privileges on Namespaces the 
 
 - `teams.tf` contains a sample configuration of the `teams` module, in this case providing namespaced `admin` privileges, and *read-only* access to Namespaces and Nodes for the specified identities.
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/namespaced-admin/teams.tf#L5-L31
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/namespaced-admin/teams.tf#L5-L31
 
 - `eks.tf` holds the EKS Cluster configuration and the setup of the `aws-auth` configMap, providing the EKS authentication model for the identities and RBAC authorization created by the `teams` module.
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/namespaced-admin/eks.tf#L28-L33
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/namespaced-admin/eks.tf#L28-L33
 
 ## Deploy
 

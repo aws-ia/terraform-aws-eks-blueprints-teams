@@ -8,11 +8,11 @@ This example shows how to create a team with Cluster Admin privileges for the sp
 
 - `teams.tf` contains a sample configuration of the `teams` module, in this case with a `cluster-admin` or *super-user* privileges for the provided identities.
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/cluster-admin/teams.tf#L5-L15
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/cluster-admin/teams.tf#L5-L15
 
 - `eks.tf` holds the EKS Cluster configuration and the setup of the `aws-auth` configMap, providing the EKS authentication model for the identities and RBAC authorization created by the `teams` module.
 
-https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/patterns/cluster-admin/eks.tf#L28-L33
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/cluster-admin/eks.tf#L28-L33
 
 ## Deploy
 
