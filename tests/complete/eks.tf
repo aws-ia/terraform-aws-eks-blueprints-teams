@@ -27,7 +27,10 @@ module "eks" {
   manage_aws_auth_configmap = true
   aws_auth_roles = flatten(
     [
-      module.operations_team.aws_auth_configmap_role,
+      module.admin_team.aws_auth_configmap_role,
+      module.platform_team.aws_auth_configmap_role,
+      module.red_team.aws_auth_configmap_role,
+      [for team in module.blue_teams : team.aws_auth_configmap_role],
     ]
   )
 

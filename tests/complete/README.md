@@ -1,4 +1,4 @@
-# Amazon EKS Blueprints Teams - Complete test
+# Amazon EKS Blueprints Teams - Multi-tenancy complete test
 
 Configuration in this directory creates:
 

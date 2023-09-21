@@ -1,21 +1,60 @@
 ################################################################################
-# EKS Blueprints Teams Module - Development Team
+# EKS Blueprints Teams Module - Multi-Tenancy
 ################################################################################
-module "development_team" {
+module "admin_team" {
   source = "../.."
 
-  name = "development-team"
+  name = "admin-team"
+
+  enable_admin = true
+  users        = [data.aws_caller_identity.current.arn]
+  cluster_arn  = module.eks.cluster_arn
+
+  tags = local.tags
+}
+
+module "platform_team" {
+  source = "../.."
+
+  name = "platform-team"
 
   users             = [data.aws_caller_identity.current.arn]
   cluster_arn       = module.eks.cluster_arn
   oidc_provider_arn = module.eks.oidc_provider_arn
 
   labels = {
-    team = "dev"
+    team = "platform"
   }
 
   annotations = {
-    team = "dev"
+    team = "platform"
+  }
+
+  cluster_role_name     = "platform-team"
+  cluster_role_ref_name = "admin"
+  role_ref = {
+    kind = "ClusterRole"
+    name = "admin"
+  }
+
+  tags = local.tags
+}
+
+module "red_team" {
+  source = "../.."
+
+  name = "red-team"
+
+  users             = [data.aws_caller_identity.current.arn]
+  cluster_arn       = module.eks.cluster_arn
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  labels = {
+    team = "red-team"
+  }
+
+  annotations = {
+    team = "red-team"
   }
 
   namespaces = {
@@ -23,10 +62,9 @@ module "development_team" {
       # Provides access to an existing namespace
       create = false
     }
-    app = {
-
+    red = {
       labels = {
-        projectName = "project-app",
+        projectName = "red-app",
       }
 
       resource_quota = {
@@ -114,6 +152,43 @@ module "development_team" {
         egress = [] # single empty rule to allow all egress traffic
 
         policy_types = ["Ingress", "Egress"]
+      }
+    }
+  }
+
+  tags = local.tags
+}
+
+module "blue_teams" {
+  source = "../.."
+
+  for_each = {
+    one = {}
+    two = {}
+  }
+  name = "blue-team-${each.key}"
+
+  users             = [data.aws_caller_identity.current.arn]
+  cluster_arn       = module.eks.cluster_arn
+  oidc_provider_arn = module.eks.oidc_provider_arn
+
+  namespaces = {
+    "blue-${each.key}" = {
+      labels = {
+        appName     = "blue-team-app",
+        projectName = "project-blue",
+      }
+
+      resource_quota = {
+        hard = {
+          "requests.cpu"    = "2000m",
+          "requests.memory" = "4Gi",
+          "limits.cpu"      = "4000m",
+          "limits.memory"   = "16Gi",
+          "pods"            = "20",
+          "secrets"         = "20",
+          "services"        = "20"
+        }
       }
     }
   }
