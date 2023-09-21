@@ -8,19 +8,25 @@ See [`patterns`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tr
 
 ### Cluster Admin
 
+This example bounds `cluster-admin` Kubernetes clusterRole permission to the specified identities. The `cluster-admin` has **unrestricted** access to manage cluster resources. More information can be found in the [`patterns/cluster-admin`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/cluster-admin) directory.
+
 https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L38-L49
 
 ### Namespaced Admin
+
+To define a namespaced-admin, you need to inform the existing `admin` Kubernetes role in the `aditional_role` variable, in order to bind it to the specified identities. More information can be found in the [`patterns/namespace-admin`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/namespaced-admin) directory.
 
 https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L50-L76
 
 ### Single Development Team
 
+Here you will define a team that have access only to specific Namespaces, with granulzarized permissions and access control to other resources in the cluster through Kubernetes networkPolicies, resourceQuotas, and limits. More information can be found in the [`patterns/development-team`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/namespaced-admin) directory.
+
 https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L77-L195
 
 ### Multiple Teams
 
-You can utilize a the Terraform `for_each` Meta-Argument at the Module level to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden.
+You can utilize a the Terraform `for_each` Meta-Argument at the Module level to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden. More information can be found in the [`patterns/multiple-app-teams`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/namespaced-admin) directory.
 
 https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L196-L231
 
