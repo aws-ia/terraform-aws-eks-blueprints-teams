@@ -322,32 +322,6 @@ resource "kubernetes_cluster_role_v1" "this" {
   }
 }
 
-# ################################################################################
-# # K8s Cluster Role Binding
-# ################################################################################
-# resource "kubernetes_cluster_role_binding_v1" "this" {
-#   count = var.create_cluster_role && !var.enable_admin ? 1 : 0
-
-#   metadata {
-#     name        = kubernetes_cluster_role_v1.this[0].metadata[0].name
-#     annotations = var.annotations
-#     labels      = var.labels
-#   }
-
-#   role_ref {
-#     api_group = "rbac.authorization.k8s.io"
-#     kind      = "ClusterRole"
-#     name      = try(var.cluster_role_ref_name == "") ? kubernetes_cluster_role_v1.this[0].metadata[0].name : var.cluster_role_ref_name
-#   }
-
-#   subject {
-#     kind      = "Group"
-#     name      = var.name
-#     api_group = "rbac.authorization.k8s.io"
-#     namespace = ""
-#   }
-# }
-
 ################################################################################
 # K8s Cluster Role Binding
 ################################################################################

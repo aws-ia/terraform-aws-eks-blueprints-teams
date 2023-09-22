@@ -10,7 +10,7 @@ This example shows how to create a multiple teams using the same approach of the
 
 ## Areas of Interest
 
-- `teams.tf` contains a sample configuration of the `teams` module, using the `for_each` Terraform Meta-Argument at the Module level creating multiple teams with the same configuration, in this case providing restricted access to specific Namespaces, and *read-only* access to list Namespaces and Nodes for the specified identities.
+- `teams.tf` contains a sample configuration of the `teams` module, using the `for_each` Terraform Meta-Argument at the Module level creating multiple teams with the same configuration, in this case providing *edit* Role access to specific Namespaces, and *read-only* access to list Namespaces and Nodes for the specified identities.
 
 https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/bcc264abb8b0c76fba5a14a38d522a73d70015ae/patterns/multiple-app-teams/teams.tf#L5-L40
 

@@ -18,6 +18,11 @@ module "development_team" {
     team = "dev"
   }
 
+  cluster_role_rule = {
+    resources = ["namespaces", "nodes", "storageclasses"]
+    verbs     = ["get", "list"]
+  }
+
   namespaces = {
     default = {
       # Provides access to an existing namespace

@@ -10,7 +10,7 @@ This example shows how to create a team with privileges restricted to the Namesp
 
 ## Areas of Interest
 
-- `teams.tf` contains a sample configuration of the `teams` module, in this case providing restricted access to specific Namespaces, and *read-only* access to list Namespaces and Nodes for the specified identities.
+- `teams.tf` contains a sample configuration of the `teams` module, in this case providing restricted *view* Role access to specific Namespaces, and *read-only* access to list Namespaces, StorageClasses and Nodes for the specified identities.
 
 https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/4def6e7e437c5b8f2c5e6479f2585fac58bf060c/patterns/development-team/teams.tf#L5-L123
 

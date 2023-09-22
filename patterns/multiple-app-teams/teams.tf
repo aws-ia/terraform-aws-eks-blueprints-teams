@@ -14,6 +14,11 @@ module "application_teams" {
   cluster_arn       = module.eks.cluster_arn
   oidc_provider_arn = module.eks.oidc_provider_arn
 
+  role_ref = {
+    kind = "ClusterRole"
+    name = "edit"
+  }
+
   namespaces = {
     "app-${each.key}" = {
       labels = {

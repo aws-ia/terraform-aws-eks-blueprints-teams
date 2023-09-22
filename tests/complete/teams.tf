@@ -34,10 +34,6 @@ module "platform_team" {
   additional_role_ref = {
     name = "admin"
   }
-  role_ref = {
-    kind = "ClusterRole"
-    name = "admin"
-  }
 
   tags = local.tags
 }
@@ -57,6 +53,11 @@ module "red_team" {
 
   annotations = {
     team = "red-team"
+  }
+
+  cluster_role_rule = {
+    resources = ["namespaces", "nodes", "persistentvolumes", "storageclasses"]
+    verbs     = ["get", "list"]
   }
 
   namespaces = {
@@ -173,6 +174,11 @@ module "blue_teams" {
   users             = [data.aws_caller_identity.current.arn]
   cluster_arn       = module.eks.cluster_arn
   oidc_provider_arn = module.eks.oidc_provider_arn
+
+  role_ref = {
+    kind = "ClusterRole"
+    name = "edit"
+  }
 
   namespaces = {
     "blue-${each.key}" = {
