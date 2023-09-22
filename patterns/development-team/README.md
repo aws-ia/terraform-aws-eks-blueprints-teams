@@ -29,7 +29,7 @@ Configuration in this directory creates:
 To run this pattern you need to execute:
 
 ```bash
-$ cd patterns/cluster-admin
+$ cd patterns/development-team
 $ terraform init
 $ terraform plan
 $ terraform apply
