@@ -355,7 +355,7 @@ resource "kubernetes_cluster_role_binding_v1" "this" {
   for_each = var.create_cluster_role && !var.enable_admin ? { for k, v in flatten([kubernetes_cluster_role_v1.this[0].metadata[0].name, try(var.additional_role_ref.name, "")]) : k => v if var.additional_role_ref != {} } : {}
 
   metadata {
-    name        = "${each.value}-rolebinding"
+    name        = each.value
     annotations = var.annotations
     labels      = var.labels
   }
