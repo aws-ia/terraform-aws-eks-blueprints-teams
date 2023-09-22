@@ -48,10 +48,10 @@ variable "cluster_role_name" {
   default     = ""
 }
 
-variable "cluster_role_ref_name" {
-  description = "Name of an existing ClusterRole to be referenced on the Kubernetes clusterRoleBinding created"
-  type        = string
-  default     = ""
+variable "additional_role_ref" {
+  description = "Existing Role or ClusterRole to be referenced on the Kubernetes clusterRoleBinding created"
+  type        = any
+  default     = {}
 }
 
 variable "cluster_role_rule" {

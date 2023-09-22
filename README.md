@@ -74,11 +74,11 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_additional_role_ref"></a> [additional\_role\_ref](#input\_additional\_role\_ref) | Existing Role or ClusterRole to be referenced on the Kubernetes clusterRoleBinding created | `any` | `{}` | no |
 | <a name="input_admin_policy_name"></a> [admin\_policy\_name](#input\_admin\_policy\_name) | Name to use on admin IAM policy created | `string` | `""` | no |
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | A map of Kubernetes annotations to add to all resources | `map(string)` | `{}` | no |
 | <a name="input_cluster_arn"></a> [cluster\_arn](#input\_cluster\_arn) | The Amazon Resource Name (ARN) of the cluster | `string` | `""` | no |
 | <a name="input_cluster_role_name"></a> [cluster\_role\_name](#input\_cluster\_role\_name) | Name to use on Kubernetes cluster role created | `string` | `""` | no |
-| <a name="input_cluster_role_ref_name"></a> [cluster\_role\_ref\_name](#input\_cluster\_role\_ref\_name) | Name of an existing ClusterRole to be referenced on the Kubernetes clusterRoleBinding created | `string` | `""` | no |
 | <a name="input_cluster_role_rule"></a> [cluster\_role\_rule](#input\_cluster\_role\_rule) | Defines the Kubernetes RBAC based `api_groups`, `resources`, and `verbs` Rules for the role created | `any` | `{}` | no |
 | <a name="input_create_cluster_role"></a> [create\_cluster\_role](#input\_create\_cluster\_role) | Determines whether a Kubernetes cluster role is created | `bool` | `true` | no |
 | <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role) | Determines whether an IAM role is created or to use an existing IAM role | `bool` | `true` | no |

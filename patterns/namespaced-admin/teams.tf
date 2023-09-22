@@ -18,8 +18,10 @@ module "operations_team" {
     team = "ops"
   }
 
-  cluster_role_name     = "ops-team"
-  cluster_role_ref_name = "admin"
+  cluster_role_name = "ops-team"
+  additional_role_ref = {
+    name = "admin"
+  }
   role_ref = {
     kind = "ClusterRole"
     name = "admin"

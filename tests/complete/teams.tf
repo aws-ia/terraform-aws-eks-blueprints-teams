@@ -30,8 +30,10 @@ module "platform_team" {
     team = "platform"
   }
 
-  cluster_role_name     = "platform-team"
-  cluster_role_ref_name = "admin"
+  cluster_role_name = "platform-team"
+  additional_role_ref = {
+    name = "admin"
+  }
   role_ref = {
     kind = "ClusterRole"
     name = "admin"
