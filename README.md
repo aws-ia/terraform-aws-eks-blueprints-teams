@@ -246,7 +246,16 @@ module "development_team" {
 }
 ```
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Support & Feedback
+
+> [!IMPORTANT]
+> EKS Blueprints for Terraform is maintained by AWS Solution Architects. It is not part of an AWS
+> service and support is provided as a best-effort by the EKS Blueprints community. To provide feedback,
+> please use the [issues templates](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/issues)
+> provided. If you are interested in contributing to EKS Blueprints, see the
+> [Contribution guide](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/.github/CONTRIBUTING.md).
+
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -325,7 +334,7 @@ No modules.
 | <a name="output_iam_role_unique_id"></a> [iam\_role\_unique\_id](#output\_iam\_role\_unique\_id) | Stable and unique string identifying the IAM role |
 | <a name="output_namespaces"></a> [namespaces](#output\_namespaces) | Map of Kubernetes namespaces created and their attributes |
 | <a name="output_rbac_group"></a> [rbac\_group](#output\_rbac\_group) | The name of the Kubernetes RBAC group |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 ## License
 
