@@ -19,7 +19,7 @@ $ terraform apply
 
 Note that this example may create resources which will incur monetary charges on your AWS bill. Run `terraform destroy` when you no longer need these resources.
 
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
@@ -77,6 +77,6 @@ No inputs.
 | <a name="output_red_team_iam_role_unique_id"></a> [red\_team\_iam\_role\_unique\_id](#output\_red\_team\_iam\_role\_unique\_id) | Stable and unique string identifying the IAM role |
 | <a name="output_red_team_namespaces"></a> [red\_team\_namespaces](#output\_red\_team\_namespaces) | Mapf of Kubernetes namespaces created and their attributes |
 | <a name="output_red_team_rbac_group"></a> [red\_team\_rbac\_group](#output\_red\_team\_rbac\_group) | The name of the Kubernetes RBAC group |
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+<!-- END_TF_DOCS -->
 
 Apache-2.0 Licensed. See [LICENSE](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/main/LICENSE)
