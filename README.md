@@ -4,7 +4,7 @@ Terraform module which creates multi-tenancy resources on Amazon EKS.
 
 ## Usage
 
-See [`tests`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/test) directory for working tests to reference:
+See [`tests`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/tests) directory for working tests to reference:
 
 
 ### Standalone - Admin Team
