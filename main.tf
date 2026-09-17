@@ -316,25 +316,28 @@ resource "kubernetes_cluster_role_v1" "this" {
   }
 
   rule {
-    api_groups = [""]
-    resources  = ["namespaces", "nodes"]
-    verbs      = ["get", "list", "watch"]
+    api_groups = try(var.cluster_role_rule.api_groups, [""])
+    resources  = try(var.cluster_role_rule.resources, ["namespaces", "nodes"])
+    verbs      = try(var.cluster_role_rule.verbs, ["get", "list", "watch"])
   }
 }
 
+################################################################################
+# K8s Cluster Role Binding
+################################################################################
 resource "kubernetes_cluster_role_binding_v1" "this" {
-  count = var.create_cluster_role && !var.enable_admin ? 1 : 0
+  for_each = var.create_cluster_role && !var.enable_admin ? { for k, v in flatten([kubernetes_cluster_role_v1.this[0].metadata[0].name, try(var.additional_role_ref.name, "")]) : k => v if var.additional_role_ref != {} } : {}
 
   metadata {
-    name        = kubernetes_cluster_role_v1.this[0].metadata[0].name
+    name        = each.value == kubernetes_cluster_role_v1.this[0].metadata[0].name ? kubernetes_cluster_role_v1.this[0].metadata[0].name : coalesce("${var.cluster_role_name}-${each.value}-additional", "${var.name}-${each.value}-additional")
     annotations = var.annotations
     labels      = var.labels
   }
 
   role_ref {
     api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = kubernetes_cluster_role_v1.this[0].metadata[0].name
+    kind      = try(var.additional_role_ref.kind, "ClusterRole")
+    name      = each.value
   }
 
   subject {
@@ -364,8 +367,8 @@ resource "kubernetes_role_binding_v1" "this" {
   # determined by the fact that this is a role binding (kubernetes_role_binding_v1).
   role_ref {
     api_group = "rbac.authorization.k8s.io"
-    kind      = "ClusterRole"
-    name      = "view"
+    kind      = try(var.role_ref.kind, "ClusterRole")
+    name      = try(var.role_ref.name, "view")
   }
 
   subject {

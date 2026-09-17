@@ -6,245 +6,29 @@ Terraform module which creates multi-tenancy resources on Amazon EKS.
 
 See [`tests`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/tests) directory for working tests to reference:
 
+### Cluster Admin
 
-### Standalone - Admin Team
+This example bounds `cluster-admin` Kubernetes clusterRole permission to the specified identities. The `cluster-admin` has **unrestricted** access to manage cluster resources. More information can be found in the [`patterns/cluster-admin`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/cluster-admin) directory.
 
-```hcl
-module "admin_team" {
-  source = "aws-ia/eks-blueprints-teams/aws"
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L38-L49
 
-  name = "admin-team"
+### Namespaced Admin
 
-  # Enables elevated, admin privileges for this team
-  enable_admin = true
-  users        = ["arn:aws:iam::111122223333:role/my-admin-role"]
-  cluster_arn  = "arn:aws:eks:us-west-2:111122223333:cluster/my-cluster"
+To define a namespaced-admin, you need to inform the existing `admin` Kubernetes role in the `aditional_role` variable, in order to bind it to the specified identities. More information can be found in the [`patterns/namespace-admin`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/namespaced-admin) directory.
 
-  tags = {
-    Environment = "dev"
-  }
-}
-```
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L50-L76
 
-### Standalone - Developer Team
+### Single Development Team
 
-```hcl
-module "development_team" {
-  source = "aws-ia/eks-blueprints-teams/aws"
+Here you will define a team that have access only to specific Namespaces, with granulzarized permissions and access control to other resources in the cluster through Kubernetes networkPolicies, resourceQuotas, and limits. More information can be found in the [`patterns/development-team`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/namespaced-admin) directory.
 
-  name = "development-team"
-
-  users             = ["arn:aws:iam::012345678901:role/my-developer"]
-  cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
-  oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
-
-  # Labels applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  labels = {
-    team = "development"
-  }
-
-  # Annotations applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  annotations = {
-    team = "development"
-  }
-
-  namespaces = {
-    default = {
-      # Provides access to an existing namespace
-      create = false
-    }
-
-    development = {
-      labels = {
-        projectName = "project-awesome",
-      }
-
-      resource_quota = {
-        hard = {
-          "requests.cpu"    = "1000m",
-          "requests.memory" = "4Gi",
-          "limits.cpu"      = "2000m",
-          "limits.memory"   = "8Gi",
-          "pods"            = "10",
-          "secrets"         = "10",
-          "services"        = "10"
-        }
-      }
-
-      limit_range = {
-        limit = [
-          {
-            type = "Pod"
-            max = {
-              cpu    = "200m"
-              memory = "1Gi"
-            }
-          },
-          {
-            type = "PersistentVolumeClaim"
-            min = {
-              storage = "24M"
-            }
-          },
-          {
-            type = "Container"
-            default = {
-              cpu    = "50m"
-              memory = "24Mi"
-            }
-          }
-        ]
-      }
-
-      network_policy = {
-        pod_selector = {
-          match_expressions = [{
-            key      = "name"
-            operator = "In"
-            values   = ["webfront", "api"]
-          }]
-        }
-
-        ingress = [{
-          ports = [
-            {
-              port     = "http"
-              protocol = "TCP"
-            },
-            {
-              port     = "53"
-              protocol = "TCP"
-            },
-            {
-              port     = "53"
-              protocol = "UDP"
-            }
-          ]
-
-          from = [
-            {
-              namespace_selector = {
-                match_labels = {
-                  name = "default"
-                }
-              }
-            },
-            {
-              ip_block = {
-                cidr = "10.0.0.0/8"
-                except = [
-                  "10.0.0.0/24",
-                  "10.0.1.0/24",
-                ]
-              }
-            }
-          ]
-        }]
-
-        egress = [] # single empty rule to allow all egress traffic
-
-        policy_types = ["Ingress", "Egress"]
-      }
-    }
-  }
-
-  tags = {
-    Environment = "dev"
-  }
-}
-```
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L77-L195
 
 ### Multiple Teams
 
-You can utilize a module level `for_each` to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden.
+You can utilize a the Terraform `for_each` Meta-Argument at the Module level to create multiple teams with the same configuration, and even allow some of those values to be defaults that can be overridden. More information can be found in the [`patterns/multiple-app-teams`](https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/tree/main/patterns/namespaced-admin) directory.
 
-```hcl
-module "development_team" {
-  source = "aws-ia/eks-blueprints-teams/aws"
-
-  for_each = {
-    one = {
-      # Add any additional variables here and update definition below to use
-      users = ["arn:aws:iam::012345678901:role/developers-one"]
-    }
-    two = {
-      users = ["arn:aws:iam::012345678901:role/developers-two"]
-    }
-    three = {
-      users = ["arn:aws:iam::012345678901:role/developers-three"]
-    }
-  }
-
-  name = "${each.key}-team"
-
-  users             = each.value.users
-  cluster_arn       = "arn:aws:eks:us-west-2:012345678901:cluster/my-cluster"
-  oidc_provider_arn = "arn:aws:iam::012345678901:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/5C54DDF35ER19312844C7333374CC09D"
-
-  # Labels applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  labels = {
-    team = each.key
-  }
-
-  # Annotations applied to all Kubernetes resources
-  # More specific labels can be applied to individual resources under `namespaces` below
-  annotations = {
-    team = each.key
-  }
-
-  namespaces = {
-    (each.key) = {
-      labels = {
-        projectName = "project-awesome",
-      }
-
-      resource_quota = {
-        hard = {
-          "requests.cpu"    = "1000m",
-          "requests.memory" = "4Gi",
-          "limits.cpu"      = "2000m",
-          "limits.memory"   = "8Gi",
-          "pods"            = "10",
-          "secrets"         = "10",
-          "services"        = "10"
-        }
-      }
-
-      limit_range = {
-        limit = [
-          {
-            type = "Pod"
-            max = {
-              cpu    = "200m"
-              memory = "1Gi"
-            }
-          },
-          {
-            type = "PersistentVolumeClaim"
-            min = {
-              storage = "24M"
-            }
-          },
-          {
-            type = "Container"
-            default = {
-              cpu    = "50m"
-              memory = "24Mi"
-            }
-          }
-        ]
-      }
-    }
-  }
-
-  tags = {
-    Environment = "dev"
-  }
-}
-```
+https://github.com/aws-ia/terraform-aws-eks-blueprints-teams/blob/42d0c1005e14f807de12a2baf9961ab272d78264/tests/complete/main.tf#L196-L231
 
 ## Support & Feedback
 
@@ -299,10 +83,12 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_additional_role_ref"></a> [additional\_role\_ref](#input\_additional\_role\_ref) | Existing Role or ClusterRole to be referenced on the Kubernetes clusterRoleBinding created | `any` | `{}` | no |
 | <a name="input_admin_policy_name"></a> [admin\_policy\_name](#input\_admin\_policy\_name) | Name to use on admin IAM policy created | `string` | `""` | no |
 | <a name="input_annotations"></a> [annotations](#input\_annotations) | A map of Kubernetes annotations to add to all resources | `map(string)` | `{}` | no |
 | <a name="input_cluster_arn"></a> [cluster\_arn](#input\_cluster\_arn) | The Amazon Resource Name (ARN) of the cluster | `string` | `""` | no |
 | <a name="input_cluster_role_name"></a> [cluster\_role\_name](#input\_cluster\_role\_name) | Name to use on Kubernetes cluster role created | `string` | `""` | no |
+| <a name="input_cluster_role_rule"></a> [cluster\_role\_rule](#input\_cluster\_role\_rule) | Defines the Kubernetes RBAC based `api_groups`, `resources`, and `verbs` Rules for the role created | `any` | `{}` | no |
 | <a name="input_create_cluster_role"></a> [create\_cluster\_role](#input\_create\_cluster\_role) | Determines whether a Kubernetes cluster role is created | `bool` | `true` | no |
 | <a name="input_create_iam_role"></a> [create\_iam\_role](#input\_create\_iam\_role) | Determines whether an IAM role is created or to use an existing IAM role | `bool` | `true` | no |
 | <a name="input_create_role"></a> [create\_role](#input\_create\_role) | Determines whether a Kubernetes role is created. Note: the role created is a cluster role but its bound to only namespaced role bindings | `bool` | `true` | no |
@@ -321,6 +107,7 @@ No modules.
 | <a name="input_oidc_provider_arn"></a> [oidc\_provider\_arn](#input\_oidc\_provider\_arn) | ARN of the OIDC provider created by the EKS cluster | `string` | `""` | no |
 | <a name="input_principal_arns"></a> [principal\_arns](#input\_principal\_arns) | A list of IAM principal arns to support passing wildcards for AWS Identity Center (SSO) roles. [Reference](https://docs.aws.amazon.com/singlesignon/latest/userguide/referencingpermissionsets.html#custom-trust-policy-example) | `list(string)` | `[]` | no |
 | <a name="input_role_name"></a> [role\_name](#input\_role\_name) | Name to use on Kubernetes role created | `string` | `""` | no |
+| <a name="input_role_ref"></a> [role\_ref](#input\_role\_ref) | Defines the reference for an existing Kubernetes role | `any` | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of tags to add to all AWS resources | `map(string)` | `{}` | no |
 | <a name="input_users"></a> [users](#input\_users) | A list of IAM user and/or role ARNs that can assume the IAM role created | `list(string)` | `[]` | no |
 
